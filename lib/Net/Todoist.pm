@@ -631,7 +631,7 @@ sub updateOrders {
     
     # validate
     defined $self->{token} or croak 'token must be passed to ->new, or call ->login, ->register before this.';
-    defined $args->{project_id} or croak 'project_id is required.';
+    defined $project_id or croak 'project_id is required.';
     
     $item_ids = [$item_ids] unless ref $item_ids eq 'ARRAY';
     
