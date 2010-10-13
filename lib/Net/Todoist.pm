@@ -425,7 +425,7 @@ sub updateLabel {
 
 =cut
 
-sub deleteProject {
+sub deleteLabel {
     my ($self, $name) = @_;
     
     # validate
@@ -514,7 +514,7 @@ sub getItemsById {
     
     $item_ids = [$item_ids] unless ref $item_ids eq 'ARRAY';
     
-    my $url = "http://todoist.com/API/getItemsById?token=$self->{token}&idss=[" . join(',', @$item_ids) . ']';
+    my $url = "http://todoist.com/API/getItemsById?token=$self->{token}&ids=[" . join(',', @$item_ids) . ']';
     $url .= '&js_date=1' if $js_date;
     my $resp = $self->{ua}->get($url);
     unless ($resp->is_success) {
@@ -525,4 +525,270 @@ sub getItemsById {
     my $data = $self->{json}->decode($resp->content);
     return wantarray ? @$data : $data;
 }
+
+=pod
+
+=head3 addItem
+
+    my $item = $nt->addItem(
+        proejct_id => $proejct_id, # required
+        content => $content, # required
+        date_string => $date_string, # optional
+        priority => $priority, # optional
+        js_date => $js_date, # optional
+    ) or die "Can't addProject: " . $nt->errstr;
+
+=cut
+
+sub addItem {
+    my $self = shift;
+    my $args = scalar @_ % 2 ? shift : { @_ };
+    
+    # validate
+    defined $self->{token} or croak 'token must be passed to ->new, or call ->login, ->register before this.';
+    defined $args->{proejct_id} or croak 'proejct_id is required.';
+    defined $args->{content} or croak 'content is required.';
+        
+    my $resp = $self->{ua}->post('https://todoist.com/API/addItem', [
+        token => $self->{token},
+        proejct_id => $args->{proejct_id},
+        content => $args->{content},
+        $args->{date_string} ? (date_string => $args->{date_string}) : (),
+        $args->{priority} ? (priority => $args->{priority}) : (),
+        $args->{js_date} ? (js_date => $args->{js_date}) : (),
+    ] );
+    unless ($resp->is_success) {
+        $errstr = $resp->status_line;
+        return;
+    }
+    unless ($resp->content =~ 'id') {
+        $errstr = $resp->content;
+        return;
+    }
+
+    my $data = $self->{json}->decode($resp->content);
+    return $data;
+}
+
+=pod
+
+=head3 updateItem
+
+    my $item = $nt->updateItem(
+        id => $item_id, # required
+        
+        content => $content, # optional
+        date_string => $date_string, # optional
+        priority => $priority, # optional
+        indent => $indent, # optional
+        item_order => $item_order, # optional
+        js_date => $js_date, # optional
+    ) or die "Can't updateProject: " . $nt->errstr;
+
+=cut
+
+sub updateItem {
+    my $self = shift;
+    my $args = scalar @_ % 2 ? shift : { @_ };
+    
+    # validate
+    defined $self->{token} or croak 'token must be passed to ->new, or call ->login, ->register before this.';
+    defined $args->{id} or croak 'id is required.';
+        
+    my $resp = $self->{ua}->post('https://todoist.com/API/updateItem', [
+        token => $self->{token},
+        id => $args->{id},
+        $args->{content} ? (content => $args->{content}) : (),
+        $args->{date_string} ? (date_string => $args->{date_string}) : (),
+        $args->{priority} ? (priority => $args->{priority}) : (),
+        $args->{indent} ? (indent => $args->{indent}) : (),
+        $args->{item_order} ? (item_order => $args->{item_order}) : (),
+        $args->{js_date} ? (js_date => $args->{js_date}) : (),
+    ] );
+    unless ($resp->is_success) {
+        $errstr = $resp->status_line;
+        return;
+    }
+    unless ($resp->content =~ 'id') {
+        $errstr = $resp->content;
+        return;
+    }
+
+    my $data = $self->{json}->decode($resp->content);
+    return $data;
+}
+
+=pod
+
+=head3 updateOrders
+
+    my $update_ok = $nt->updateOrders( $project_id, \@item_ids ) or die "Can't updateOrders: " . $nt->errstr;
+
+=cut
+
+sub updateOrders {
+    my ($self, $project_id, $item_ids) = @_;
+    
+    # validate
+    defined $self->{token} or croak 'token must be passed to ->new, or call ->login, ->register before this.';
+    defined $args->{project_id} or croak 'project_id is required.';
+    
+    $item_ids = [$item_ids] unless ref $item_ids eq 'ARRAY';
+    
+    my $url = "http://todoist.com/API/updateOrders?token=$self->{token}&project_id=$project_id&item_id_list=[" . join(',', @$item_ids) . ']';
+    my $resp = $self->{ua}->get($url);
+    unless ($resp->is_success) {
+        $errstr = $resp->status_line;
+        return;
+    }
+    
+    return ($resp->content =~ /ok/i) ? 1 : 0;
+}
+
+=pod
+
+=head3 updateRecurringDate
+
+    # js_date is optional
+    my @items = $nt->updateRecurringDate( \@item_ids, $js_date )
+        or die "Can't updateRecurringDate: " . $nt->errstr;
+
+=cut
+
+sub updateRecurringDate {
+    my ($self, $item_ids, $js_date) = @_;
+    
+    # validate
+    defined $self->{token} or croak 'token must be passed to ->new, or call ->login, ->register before this.';
+    
+    $item_ids = [$item_ids] unless ref $item_ids eq 'ARRAY';
+    
+    my $url = "http://todoist.com/API/updateRecurringDate?token=$self->{token}&ids=[" . join(',', @$item_ids) . ']';
+    $url .= '&js_date=1' if $js_date;
+    my $resp = $self->{ua}->get($url);
+    unless ($resp->is_success) {
+        $errstr = $resp->status_line;
+        return;
+    }
+    
+    my $data = $self->{json}->decode($resp->content);
+    return wantarray ? @$data : $data;
+}
+
+=pod
+
+=head3 deleteItems
+
+    my $is_deleted = $nt->deleteItems(@item_ids);
+    my $is_deleted = $nt->deleteItems(\@item_ids);
+    
+=cut
+
+sub deleteItems {
+    my ($self, @item_ids) = @_;
+    
+    # validate
+    defined $self->{token} or croak 'token must be passed to ->new, or call ->login, ->register before this.';
+    @item_ids = @{ $item_ids[0] } if scalar(@item_ids) == 2 and ref $item_ids[0] eq 'ARRAY';
+
+    my $url = "http://todoist.com/API/deleteItems?token=$self->{token}&ids=[" . join(',', @item_ids) . ']';
+    my $resp = $self->{ua}->get($url);
+    unless ($resp->is_success) {
+        $errstr = $resp->status_line;
+        return;
+    }
+    
+    return ($resp->content =~ /ok/i) ? 1 : 0;
+}
+
+=pod
+
+=head3 completeItems
+
+    # in_history is optional, default as 1
+    my $is_ok = $nt->completeItems(\@item_ids, $in_history) or die "Can't completeItems: " . $nt->errstr;
+
+=cut
+
+sub completeItems {
+    my ($self, $item_ids, $in_history) = @_;
+    
+    # validate
+    defined $self->{token} or croak 'token must be passed to ->new, or call ->login, ->register before this.';
+    $item_ids = [$item_ids] unless ref $item_ids eq 'ARRAY';
+    
+    my $url = "http://todoist.com/API/completeItems?token=$self->{token}&ids=[" . join(',', @$item_ids) . ']';
+    $url .= '&in_history=1' if $in_history;
+    my $resp = $self->{ua}->get($url);
+    unless ($resp->is_success) {
+        $errstr = $resp->status_line;
+        return;
+    }
+    
+    return ($resp->content =~ /ok/i) ? 1 : 0;
+}
+
+=pod
+
+=head3 uncompleteItems
+
+    my $is_ok = $nt->uncompleteItems(@item_ids);
+    my $is_ok = $nt->uncompleteItems(\@item_ids);
+    
+=cut
+
+sub uncompleteItems {
+    my ($self, @item_ids) = @_;
+    
+    # validate
+    defined $self->{token} or croak 'token must be passed to ->new, or call ->login, ->register before this.';
+    @item_ids = @{ $item_ids[0] } if scalar(@item_ids) == 2 and ref $item_ids[0] eq 'ARRAY';
+
+    my $url = "http://todoist.com/API/uncompleteItems?token=$self->{token}&ids=[" . join(',', @item_ids) . ']';
+    my $resp = $self->{ua}->get($url);
+    unless ($resp->is_success) {
+        $errstr = $resp->status_line;
+        return;
+    }
+    
+    return ($resp->content =~ /ok/i) ? 1 : 0;
+}
+
+=pod
+
+=head3 query
+
+    my @items = $nt->query(
+        queries => ["2007-4-29T10:13","overdue","p1","p2"], # required
+        as_count => 0, # optional
+        js_date  => 0, # optional
+    )
+
+=cut
+
+sub query {
+    my $self = shift;
+    my $args = scalar @_ % 2 ? shift : { @_ };
+    
+    # validate
+    defined $self->{token} or croak 'token must be passed to ->new, or call ->login, ->register before this.';
+    defined $args->{queries} or croak 'queries is required.';
+    my $queries = $args->{queries};
+    $queries = [$queries] unless ref $queries eq 'ARRAY';
+        
+    my $resp = $self->{ua}->post('https://todoist.com/API/query', [
+        token => $self->{token},
+        queries => '[' . join(',', @$queries) . ']',
+        $args->{as_count} ? (as_count => $args->{as_count}) : (),
+        $args->{js_date} ? (js_date => $args->{js_date}) : (),
+    ] );
+    unless ($resp->is_success) {
+        $errstr = $resp->status_line;
+        return;
+    }
+
+    my $data = $self->{json}->decode($resp->content);
+    return wantarray ? @$data : $data;
+}
+
 1;
