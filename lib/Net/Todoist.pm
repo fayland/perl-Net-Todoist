@@ -514,7 +514,7 @@ sub getItemsById {
     
     $item_ids = [$item_ids] unless ref $item_ids eq 'ARRAY';
     
-    my $url = "http://todoist.com/API/getItemsById?token=$self->{token}&ids=[" . join(',', @$item_ids) . ']';
+    my $url = "http://todoist.com/API/getItemsById?token=$self->{token}&ids=" . join(',', @$item_ids);
     $url .= '&js_date=1' if $js_date;
     my $resp = $self->{ua}->get($url);
     unless ($resp->is_success) {
@@ -689,7 +689,7 @@ sub deleteItems {
     
     # validate
     defined $self->{token} or croak 'token must be passed to ->new, or call ->login, ->register before this.';
-    @item_ids = @{ $item_ids[0] } if scalar(@item_ids) == 2 and ref $item_ids[0] eq 'ARRAY';
+    @item_ids = @{ $item_ids[0] } if scalar(@item_ids) == 1 and ref $item_ids[0] eq 'ARRAY';
 
     my $url = "http://todoist.com/API/deleteItems?token=$self->{token}&ids=[" . join(',', @item_ids) . ']';
     my $resp = $self->{ua}->get($url);
@@ -742,7 +742,7 @@ sub uncompleteItems {
     
     # validate
     defined $self->{token} or croak 'token must be passed to ->new, or call ->login, ->register before this.';
-    @item_ids = @{ $item_ids[0] } if scalar(@item_ids) == 2 and ref $item_ids[0] eq 'ARRAY';
+    @item_ids = @{ $item_ids[0] } if scalar(@item_ids) == 1 and ref $item_ids[0] eq 'ARRAY';
 
     my $url = "http://todoist.com/API/uncompleteItems?token=$self->{token}&ids=[" . join(',', @item_ids) . ']';
     my $resp = $self->{ua}->get($url);
