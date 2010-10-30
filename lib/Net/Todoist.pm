@@ -300,7 +300,7 @@ sub addProject {
 =head3 updateProject
 
     my $project = $nt->updateProject(
-        proejct_id => $proejct_id, # required
+        project_id => $project_id, # required
         
         name => $name, # optional
         color => $color, # optional
@@ -315,11 +315,11 @@ sub updateProject {
     
     # validate
     defined $self->{token} or croak 'token must be passed to ->new, or call ->login, ->register before this.';
-    defined $args->{proejct_id} or croak 'proejct_id is required.';
+    defined $args->{project_id} or croak 'project_id is required.';
         
     my $resp = $self->{ua}->post('https://todoist.com/API/updateProject', [
         token => $self->{token},
-        proejct_id => $args->{proejct_id},
+        project_id => $args->{project_id},
         $args->{name} ? (order => $args->{name}) : (),
         $args->{color} ? (color => $args->{color}) : (),
         $args->{indent} ? (indent => $args->{indent}) : (),
@@ -531,7 +531,7 @@ sub getItemsById {
 =head3 addItem
 
     my $item = $nt->addItem(
-        proejct_id => $proejct_id, # required
+        project_id => $project_id, # required
         content => $content, # required
         date_string => $date_string, # optional
         priority => $priority, # optional
@@ -546,12 +546,12 @@ sub addItem {
     
     # validate
     defined $self->{token} or croak 'token must be passed to ->new, or call ->login, ->register before this.';
-    defined $args->{proejct_id} or croak 'proejct_id is required.';
+    defined $args->{project_id} or croak 'project_id is required.';
     defined $args->{content} or croak 'content is required.';
         
     my $resp = $self->{ua}->post('https://todoist.com/API/addItem', [
         token => $self->{token},
-        proejct_id => $args->{proejct_id},
+        project_id => $args->{project_id},
         content => $args->{content},
         $args->{date_string} ? (date_string => $args->{date_string}) : (),
         $args->{priority} ? (priority => $args->{priority}) : (),
