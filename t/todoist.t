@@ -9,7 +9,14 @@ use Net::Todoist;
 my $nt = Net::Todoist->new();
 my @timezone = $nt->getTimezones();
 
-ok( grep { $_->[1] and $_->[1] eq "GMT+08:00 - Beijing" } @timezone );
+if (@timezone) {
+    ok( grep { $_->[1] and $_->[1] eq "GMT+08:00 - Beijing" } @timezone );
+} elsif ($nt->errstr) {
+    diag("Warn: " . $nt->errstr);
+    ok(1);
+} else {
+    fail("Can't get timezones and no HTTP error");
+}
 
 done_testing();
 

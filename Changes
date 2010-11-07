@@ -1,5 +1,8 @@
 Revision history for Perl extension Net-Todoist
 
+0.04    2010.11.07
+        fix tests
+
 0.03    2010.11.06
         Test::More 0.88 for done_testing
 
