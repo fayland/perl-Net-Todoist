@@ -31,7 +31,13 @@ use vars qw/$errstr/;
 
 =head1 DESCRIPTION
 
-read L<http://todoist.com/API/help> for more details.
+This module provide an interface to the API for the
+L<Todoist|http://todoist.com/>.
+Todoist is a to-do list service that can be accessed from
+a web interface or dedicated desktop or mobile clients.
+The basic service is free, but you can pay to get additional features.
+
+Read L<http://todoist.com/API/help> for more details.
 
 =head2 METHODS
 
