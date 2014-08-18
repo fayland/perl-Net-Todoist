@@ -798,3 +798,12 @@ sub query {
 }
 
 1;
+
+=head1 SEE ALSO
+
+L<http://todoist.com> - home page for Todoist.
+
+L<http://todoist.com/API/help> - documentation for the API.
+
+=cut
+
