@@ -1,6 +1,6 @@
 package Net::Todoist;
 
-# ABSTRACT: Todoist API
+# ABSTRACT: interface to the API for Todoist (a to-do list service)
 
 use strict;
 use warnings;

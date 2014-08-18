@@ -1,6 +1,7 @@
 Revision history for Perl extension Net-Todoist
 
 0.06    2014-08-??
+        - Improved the abstract (NAME section in pod)
         - Tweaked format of this file as per CPAN::Changes::Spec
 
 0.05    2014-03-27
