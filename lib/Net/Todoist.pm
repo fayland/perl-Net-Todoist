@@ -1,6 +1,6 @@
 package Net::Todoist;
 
-# ABSTRACT: Todoist API
+# ABSTRACT: interface to the API for Todoist (a to-do list service)
 
 use strict;
 use warnings;
@@ -31,7 +31,13 @@ use vars qw/$errstr/;
 
 =head1 DESCRIPTION
 
-read L<http://todoist.com/API/help> for more details.
+This module provide an interface to the API for the
+L<Todoist|http://todoist.com/>.
+Todoist is a to-do list service that can be accessed from
+a web interface or dedicated desktop or mobile clients.
+The basic service is free, but you can pay to get additional features.
+
+Read L<http://todoist.com/API/help> for more details.
 
 =head2 METHODS
 
@@ -792,3 +798,12 @@ sub query {
 }
 
 1;
+
+=head1 SEE ALSO
+
+L<http://todoist.com> - home page for Todoist.
+
+L<http://todoist.com/API/help> - documentation for the API.
+
+=cut
+
